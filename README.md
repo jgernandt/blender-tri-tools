@@ -2,7 +2,7 @@
 A Blender addon for working with Skyrim face morphs.
 
 ## About
-This addon adds three functions to Blender: import and export FaceGen TRI files, and transfer shape keys between objects. It's purpose is to quickly generate the various morphs required by Skyrim head parts.
+This addon adds three functions to Blender: import and export FaceGen TRI files, and transfer shape keys between objects. Its purpose is to quickly generate the various morphs required by Skyrim head parts.
 
 ## Import-export
 The import-export functionality follows the FaceGen specification (https://facegen.com/dl/sdk/doc/manual/fileformats.html). There exist other file formats that use the .tri extension, but those will not be readable. 
