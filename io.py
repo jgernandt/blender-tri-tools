@@ -194,13 +194,13 @@ def export_tri(op, mesh):
                 op.report({'INFO'}, "Shape %s is identical to reference" % shape.name)
                 scale = 1.0
             else:
-                scale = 32767 / delta_max
+                scale = delta_max / 32767
             
             write_morph_label(file, shape)
             
             file.write(struct.pack("<f", scale))
             for d in deltas:
-                file.write(struct.pack("<3h", round(d[0] * scale), round(d[1] * scale), round(d[2] * scale)))
+                file.write(struct.pack("<3h", round(d[0] / scale), round(d[1] / scale), round(d[2] / scale)))
         
         #Stat morphs
         for shape, vtx_ind_list in zip(abs_morphs, abs_morph_verts):
