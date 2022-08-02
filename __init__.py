@@ -28,7 +28,7 @@ else:
 bl_info = {
     'name': "TRI Tools",
     'author': "Jonas Gernandt",
-    'version': (1, 0, 0),
+    'version': (1, 1, 0),
     'blender': (3, 2, 0),
     'location': "File > Import-Export and View3D > Tools",
     'description': "Import and export FaceGen TRI files, and transfer shape keys by proximity between meshes",
