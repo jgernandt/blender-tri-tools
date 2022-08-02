@@ -48,6 +48,10 @@ def transfer_diff(r, src, diffs, falloff):
 def transfer_shapes(operator, source, target):
     """Transfer all shape keys in source mesh to target mesh, as determined from the closest point"""
     if source.data.shape_keys != None:
+        
+        #Warn about different world space transforms
+        if source.matrix_world != target.matrix_world:
+            operator.report({'WARNING'}, "World-space transforms are not accounted for")
 
         if target.data.shape_keys == None:
             target.shape_key_add(name="Basis", from_mix=False)
