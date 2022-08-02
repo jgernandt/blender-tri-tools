@@ -22,28 +22,10 @@ import bpy
 import mathutils
 
 
-def get_decay_factor(d, f):
-    return math.exp(-f * d)
-
-
-def transfer_diff(r, src, diffs, falloff):
-    """Find the closest point on src mesh from point r and return the interpolation of the vectors diff in this point"""
-    
-    result, location, _, index = src.closest_point_on_mesh(r)
-    if result:
-        vertices = [src.data.vertices[src.data.loops[i].vertex_index]
-            for i in src.data.polygons[index].loop_indices]
-        weights = mathutils.interpolate.poly_3d_calc([mathutils.Vector(v.co) for v in vertices], location)
-        
-        raw = sum([diffs[vertices[i].index] * weights[i] for i in range(len(vertices))], mathutils.Vector())
-        
-        if falloff > 0.0:
-            raw *= get_decay_factor((r - location).length, falloff)
-        
-        return raw
-    else:
-        return mathutils.Vector()
-
+def target_diff(d, diffs, indices, weights, falloff):
+    result = sum([diffs[indices[i]] * weights[i] for i in range(len(indices))], mathutils.Vector())
+    result *= math.exp(-falloff * d)
+    return result
 
 def transfer_shapes(operator, source, target):
     """Transfer all shape keys in source mesh to target mesh, as determined from the closest point"""
@@ -55,6 +37,20 @@ def transfer_shapes(operator, source, target):
 
         if target.data.shape_keys == None:
             target.shape_key_add(name="Basis", from_mix=False)
+        
+        #gather distance info and interpolation parameters (will be the same for all shapes)
+        distances = [0.0] * len(target.data.vertices)
+        indices = [[]] * len(target.data.vertices)
+        weights = [[]] * len(target.data.vertices)
+        for v in target.data.vertices:
+            result, location, _, index = source.closest_point_on_mesh(v.co)
+            if result:
+                src_verts = [source.data.vertices[source.data.loops[i].vertex_index]
+                    for i in source.data.polygons[index].loop_indices]
+                
+                distances[v.index] = (v.co - location).length
+                indices[v.index] = [vtx.index for vtx in src_verts]
+                weights[v.index] = mathutils.interpolate.poly_3d_calc([mathutils.Vector(vtx.co) for vtx in src_verts], location)
 
         for src_shape in source.data.shape_keys.key_blocks:
             ref = source.data.shape_keys.reference_key
@@ -65,7 +61,7 @@ def transfer_shapes(operator, source, target):
             src_diff = [src_shape.data[i].co - ref.data[i].co for i in range(len(source.data.vertices))]
             
             #calc the corresponding difference vectors of the target shape
-            tgt_diff = [transfer_diff(target.data.vertices[i].co, source, src_diff, target.tri_transfer_shapes.distance_falloff) 
+            tgt_diff = [target_diff(distances[i], src_diff, indices[i], weights[i], target.tri_transfer_shapes.distance_falloff) 
                 for i in range(len(target.data.vertices))]
             
             #filter out empty morphs
