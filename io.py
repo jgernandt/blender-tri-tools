@@ -251,7 +251,17 @@ def import_tri(op, context):
         tris = [struct.unpack("<3i", file.read(12)) for _ in range(T)]
         quads = [struct.unpack("<4i", file.read(16)) for _ in range(Q)]
         
+        #transfer to the mesh
         mesh.data.from_pydata(vertices, [], tris + quads)
+        #in case of corrupt data, delete the mesh and cancel import
+        if mesh.data.validate():
+            if IS_2_79:
+                context.scene.objects.unlink(mesh)
+            else:
+                context.collection.objects.unlink(mesh)
+            context.blend_data.objects.remove(mesh)
+            context.blend_data.meshes.remove(mesh_data)
+            raise RuntimeError("Invalid mesh data; file is corrupt or in an unknown format")
         
         #discard vertex labels
         for _ in range(LV):
