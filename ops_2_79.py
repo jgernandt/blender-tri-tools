@@ -78,6 +78,7 @@ class TRIImport(TRIOperator, bpy_extras.io_utils.ImportHelper, TRIOrientationHel
     bl_label = 'Import TRI'
     bl_idname = 'import_mesh.facegen_tri'
     bl_description = "Import FaceGen TRI file"
+    bl_options = {'UNDO'}
     
     filename_ext = ".tri"
     
@@ -98,6 +99,7 @@ class TRITransferShapes(TRIOperator):
     bl_description = "Transfer shape keys from selected to active object"
     bl_idname = "object.tri_transfer_shapes"
     bl_label = "Transfer Shapes"
+    bl_options = {'UNDO'}
     
     @classmethod
     def poll(cls, context):
