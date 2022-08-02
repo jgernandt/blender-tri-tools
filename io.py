@@ -227,16 +227,16 @@ def import_tri(op, context):
         #Create and activate new mesh
         name = os.path.splitext(os.path.basename(op.filepath))[0]
         mesh_data = context.blend_data.meshes.new(name)
-        mesh = bpy.data.objects.new(name, mesh_data)
+        mesh = context.blend_data.objects.new(name, mesh_data)
         
         bpy.ops.object.select_all(action='DESELECT')
         
         if IS_2_79:
-            bpy.context.scene.objects.link(mesh)
+            context.scene.objects.link(mesh)
             mesh.select = True
             context.scene.objects.active = mesh
         else:
-            bpy.context.collection.objects.link(mesh)
+            context.collection.objects.link(mesh)
             mesh.select_set(True)
             context.view_layer.objects.active = mesh
         
